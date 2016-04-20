@@ -5,16 +5,17 @@ import java.util.ArrayList;
 
 public class SelectivityCalculator {
 	
-	private static ArrayList<Integer> value = new ArrayList<Integer>();
+	private ArrayList<Integer> value = new ArrayList<Integer>();
+	private ArrayList<Integer> bucketSize = new ArrayList<>();
 	private ArrayList<ArrayList<Integer>> bucketList = new ArrayList<ArrayList<Integer>>();
-	private static int bucketNumber = 10;
+	private int bucketNumber = 10; // For samll dataset, set it to 1
 	
 	public SelectivityCalculator()
 	{
 		value = new ArrayList<Integer>();
 	}
 
-	public void Calculator(ArrayList<Integer> R, ArrayList<Integer> S) 
+	public void Calculator(ArrayList<Integer> S) //To get the buckets
 	{
 		
 		
@@ -57,102 +58,127 @@ public class SelectivityCalculator {
 			System.out.println(bucketList.get(0));
 		}
 		
-		//System.out.println(bucketList.size());
+		for(int m = 0; m<bucketList.size(); m++)
+		{
+			int sum = 0;
+			for(int n = 0; n<bucketList.get(m).size(); n++)
+			{
+				sum += bucketList.get(m).get(n);
+			}
+			bucketSize.add(sum);
+		}
+		
+		System.out.println(bucketSize.toString());
 		//System.out.println(value.size());
 	}
 	
-	public double selectivityCal(ArrayList<Integer> SampleR, ArrayList<Integer> S, int op) {
-		double selectivity = 0.0;
-		//less than
-		if (op == 1) {
-			int index = 0;
-			int numberOfBucket = 0;
-			int rem = 0;
-			double sum = 0.0;
-			for (int r : SampleR) {
-				for (int v : value) {
-					if (r > v) {
-						index = value.indexOf(v);
-						numberOfBucket = index / 10;
-						rem = index % 10;
-						int i;
-						for (i = 0; i < numberOfBucket; i++) {
-							//System.out.println(bucketList.get(i).toString());
-							for (int j = 0; j < bucketList.get(i).size(); j++) {
-								System.out.println(sum);
-								sum += bucketList.get(i).get(j);
-							}
-						}
-						int remSum = 0;
-						for (int k = 0; k < bucketList.get(i).size(); k++) {
-							remSum += bucketList.get(i).get(k);
-						}
-						sum += (remSum * (rem+1) / 10.0);
-						//System.out.println(sum);
-						//System.out.println(sum);
-						//System.out.println(SampleR.size());
-						//System.out.println(S.size());
-						
-					}
-					
-				break;
-				}
-				//total += sum;
-				//sum = 0;
-			}
-			selectivity = sum / (SampleR.size() * S.size());
-		} else if (op == 0){//greater than
-			int index = 0;
-			int numberOfBucket = 0;
-			int rem = 0;
-			int remBucketIndex;
-			double sum = 0.0;
-			for (int r : SampleR) {
-				for (int v : value) {
-					if (r < v) {
-						index = value.indexOf(v);
-						rem = index % 10;
-						remBucketIndex = index / 10;
-						int i;
-						for (i = remBucketIndex + 1; i < bucketList.size(); i++) {
-							for (int j = 0; j < bucketList.get(i).size(); j++) {
-								sum += bucketList.get(i).get(j);
-							}
-						}
-						int remSum = 0;
-						for (int k = 0; k < bucketNumber; k++) {
-							remSum += bucketList.get(remBucketIndex).get(k);
-						}
-						sum += remSum * (bucketNumber - rem) / 10.0;
-						selectivity = sum / (SampleR.size() * S.size());
+	public double selectivityCalculator(ArrayList<Integer> SampleR, ArrayList<Integer> S, int op)
+	{
+		double selectivity = 0d;
+		
+		if(op == 1)//R less than S
+		{
+			double selectCount = 0d;
+			
+			for(int r : SampleR)
+			{
+				int i = 0;
+				for(; i<S.size(); i++)
+				{
+					if(r < S.get(i))
+					{
+						System.out.println("R: " + r + " S: " + S.get(i));
+						break;
 					}
 				}
-			break;
+				int bucketNum = (int)(i/bucketNumber);
+				int remain = i%bucketNumber;
+				
+				double bucketSum = 0;
+				for(int j = bucketNum + 1; j < bucketSize.size(); j++)
+				{
+					bucketSum += bucketSize.get(j);
+				}
+				
+				if(remain != 0 || bucketNum < bucketSize.size())
+				{
+					bucketSum += (bucketSize.get(bucketNum)*(bucketNumber-remain)/(double)bucketNumber);//If the last bucket is not full, we get an estimate count
+				}
+				
+				selectCount += bucketSum;
 			}
 			
-		} else {
+			selectivity = selectCount/(SampleR.size() * S.size());
+		}
+		
+		if(op == 2)//R greater than S
+		{
+			double selectCount = 0d;
+			
+			for(int r : SampleR)
+			{
+				int i = 0;
+				for(; i<S.size(); i++)
+				{
+					if(r <= S.get(i))
+					{
+						System.out.println("R: " + r + " S: " + S.get(i));
+						break;
+					}
+				}
+				
+				int bucketNum = (int)(i/bucketNumber);
+				int remain = i%bucketNumber;
+				
+				double bucketSum = 0;
+				
+				for(int j = 0; j < bucketNum; j++)
+				{
+					bucketSum += bucketSize.get(j);
+				}
+				
+				System.out.println(bucketNum);
+				
+				if(remain != 0)
+				{
+					bucketSum += (bucketSize.get(bucketNum)*(remain)/(double)bucketNumber);
+				}
+				
+				selectCount += bucketSum;
+			}
+			
+			selectivity = selectCount/(SampleR.size() * S.size());
+		}
+		
+		if(op == 0)//Extra credit R == S
+		{
 			
 		}
+		
 		return selectivity;
 	}
+	
 
 	public static void main(String args[]) throws FileNotFoundException {
 		//ArrayList<Integer> sampleR = Sampling.readCSV("src/Phase4/F1r.csv", 0.2, "1000");
 		//ArrayList<Integer> sampleS = Sampling.readCSV("src/Phase4/F2r.csv", 0.1, "1000");
-		Sampling sample = new Sampling("src/Phase4/F1r.csv", "src/Phase4/F2r.csv", 0.02, 0.1, "10000", "9000");
-		System.out.println(sample.SampleR.size()); 
-//		System.out.println(sample.RSort.size());
-//		System.out.println(sample.SampleS.size());
-//		System.out.println(sample.SSort.toString());
+		Sampling sampleCondition1 = new Sampling("src/tests/R2.txt", "src/tests/S2.txt", 1, 1, "4", "4");
+		Sampling sampleCondition2 = new Sampling("src/tests/R2.txt", "src/tests/S2.txt", 1, 1, "4", "4");
 		
-		SelectivityCalculator xo = new SelectivityCalculator();
 		
-		xo.Calculator(sample.SampleR, sample.SampleR);
+		SelectivityCalculator xo1 = new SelectivityCalculator();
+		SelectivityCalculator xo2 = new SelectivityCalculator();
 		
-		double res = xo.selectivityCal(sample.SampleR, sample.SampleR, 1);
-		System.out.println(res);
-		System.out.println(sample.SampleR.size());
-		System.out.println(value.size());
+		xo1.Calculator(sampleCondition1.SampleS);
+		xo2.Calculator(sampleCondition2.SampleS);
+		
+		double res1 = xo1.selectivityCalculator(sampleCondition1.SampleR, sampleCondition1.SampleS, 1);
+		double res2 = xo2.selectivityCalculator(sampleCondition2.SampleR, sampleCondition2.SampleS, 2);
+		
+		System.out.println(res1);
+		System.out.println(res2);
+//		System.out.println(sample.SampleR.size());
+//		System.out.println(value.size());
 //		System.out.println(value.toString());
 	}
 

@@ -23,7 +23,7 @@ public class Task1aSolution {
 		
 		boolean status;
 		JoinsDriverTask1aSolution joinsDriverTask1aSolution = new JoinsDriverTask1aSolution(
-				"src/tests/R.txt", "src/tests/S.txt", "src/tests/query_1a.txt");
+				"src/tests/R2.txt", "src/tests/S2.txt", "src/tests/query_1a.txt");
 		status = joinsDriverTask1aSolution.runTests();
 		if (status != true) {
 			System.out

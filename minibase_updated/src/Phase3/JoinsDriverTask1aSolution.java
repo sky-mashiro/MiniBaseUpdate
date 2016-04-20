@@ -419,12 +419,12 @@ public class JoinsDriverTask1aSolution implements GlobalConst {
 				// define the type of attributes in relation_r.	
 				rAttrTypes = new AttrType[intAttr.length];
 				for(int k =0;k<intAttr.length;k++){
-					if(intAttr[k].equalsIgnoreCase("attrInteger")){
+					//if(intAttr[k].equalsIgnoreCase("attrInteger")){
 						rAttrTypes[k] = new AttrType(AttrType.attrInteger);
-					}else{
-						System.err.println("*** error when set attributes types R.txt: can not handle non-integer attr: "+intAttr[k]+" ***");
-						Runtime.getRuntime().exit(1);
-					}
+//					}else{
+//						System.err.println("*** error when set attributes types R.txt: can not handle non-integer attr: "+intAttr[k]+" ***");
+//						Runtime.getRuntime().exit(1);
+//					}
 				}
 			}
 			ir++;
@@ -449,12 +449,12 @@ public class JoinsDriverTask1aSolution implements GlobalConst {
 				// define the type of attributes in relation_s.	
 				sAttrTypes = new AttrType[intAttr.length];
 				for(int k =0;k<intAttr.length;k++){
-					if(intAttr[k].equalsIgnoreCase("attrInteger")){
+					//if(intAttr[k].equalsIgnoreCase("attrInteger")){
 						sAttrTypes[k] = new AttrType(AttrType.attrInteger);
-					}else{
-						System.err.println("*** error when set attributes types S.txt: can not handle non-integer attr: "+intAttr[k]+" ***");
-						Runtime.getRuntime().exit(1);
-					}
+//					}else{
+//						System.err.println("*** error when set attributes types S.txt: can not handle non-integer attr: "+intAttr[k]+" ***");
+//						Runtime.getRuntime().exit(1);
+//					}
 				}
 			}
 			js++;
